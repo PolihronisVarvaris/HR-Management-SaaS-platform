@@ -1,0 +1,14 @@
+# Development
+*.log
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+
+# Build
+dist/
+build/
+
+# Database (if using SQLite locally)
+*.db
