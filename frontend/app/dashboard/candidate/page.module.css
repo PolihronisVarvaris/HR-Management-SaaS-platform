@@ -1,0 +1,35 @@
+:root{--card:#fff;--muted:#6b7280;--accent:#2563eb;--shadow:0 8px 24px rgba(16,24,40,0.06);--radius:12px}
+
+.wrap{display:flex;flex-direction:column;gap:16px;padding:0;font-family:Inter,system-ui,Arial;color:#0f172a}
+.header{display:flex;justify-content:space-between;align-items:center}
+.h1{font-size:20px;margin:0 0 6px 0;font-weight:700}
+.sub{margin:0;color:var(--muted)}
+.primary{background:linear-gradient(90deg,var(--accent),#7c3aed);color:white;padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
+
+.statsGrid{display:grid;grid-template-columns:1fr;gap:12px}
+.statCard{background:var(--card);padding:14px;border-radius:12px;box-shadow:var(--shadow)}
+.statHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.statLabel{color:var(--muted);font-size:13px}
+.statIcon{font-size:18px}
+.statValue{font-size:22px;font-weight:800}
+.statChange{font-size:13px;color:#16a34a;margin-top:6px}
+
+.recent{display:flex;flex-direction:column;gap:10px}
+.sectionTitle{margin:0;font-size:16px;font-weight:700}
+.appsList{display:flex;flex-direction:column;gap:10px}
+.appRow{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:12px;border:1px solid #eef2f7;background:var(--card)}
+.appLeft{display:flex;align-items:center;gap:12px}
+.appIcon{width:44px;height:44px;border-radius:10px;background:linear-gradient(90deg,#60a5fa,#7c3aed);display:grid;place-items:center;color:white}
+.appTitle{font-weight:600}
+.appCompany{font-size:13px;color:var(--muted)}
+.appRight{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.badge{padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid transparent}
+.statusInterview{background:#ecfdf5;color:#065f46;border-color:#bbf7d0}
+.statusApplied{background:#eff6ff;color:#1e3a8a;border-color:#bfdbfe}
+.statusRejected{background:#fff1f2;color:#9f1239;border-color:#fecaca}
+.statusDefault{background:#f3f4f6;color:#374151;border-color:#e5e7eb}
+.appDate{font-size:12px;color:var(--muted)}
+
+@media(min-width:900px){
+  .statsGrid{grid-template-columns:repeat(4,1fr)}
+}

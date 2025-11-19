@@ -1,0 +1,16 @@
+:root{
+  --card:#a71515; --muted:#ec202b; --accent:#ec202b; --shadow:0 8px 24px rgba(16,24,40,0.06); --radius:12px;
+}
+
+.wrap{display:flex;flex-direction:column;gap:16px;font-family:Inter,system-ui,Arial}
+.headerCard{display:flex;justify-content:space-between;align-items:center;background:var(--card);padding:16px;border-radius:var(--radius);box-shadow:var(--shadow)}
+.h1{font-size:20px;margin:0 0 6px 0;font-weight:700}
+.lead{margin:0;color:var(--muted)}
+.primary{background:linear-gradient(90deg,var(--accent),#ec202b);color:rgb(0, 0, 0);border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
+
+.grid{display:grid;grid-template-columns:1fr;gap:12px}
+.card{background:var(--card);padding:14px;border-radius:10px;box-shadow:var(--shadow)}
+.cardTitle{margin:0 0 6px 0;font-weight:700}
+.cardText{margin:0;color:var(--muted)}
+
+@media(min-width:900px){.grid{grid-template-columns:repeat(3,1fr)}}

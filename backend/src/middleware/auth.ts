@@ -1,55 +1,70 @@
-import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
+import { Response, NextFunction } from 'express';
+import { verifyAccessToken } from '../utils/jwt';
+import { AuthRequest } from '../types/auth';
+import { prisma } from '../lib/db';
 
-const prisma = new PrismaClient();
-
-export interface AuthRequest extends Request {
-  user?: {
-    userId: string;
-    role: string;
-    email: string;
-  };
-}
-
-export const authenticate = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const authenticate = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const authHeader = req.header('Authorization');
-    const token = authHeader?.replace('Bearer ', '');
-
-    if (!token) {
-      return res.status(401).json({ error: 'Access denied. No token provided.' });
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as any;
+    const authHeader = req.headers.authorization;
     
-    // Verify user still exists and is active
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.userId, isActive: true },
-      select: { id: true, email: true, role: true }
-    });
-
-    if (!user) {
-      return res.status(401).json({ error: 'User not found or inactive' });
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Access token required' });
     }
 
-    req.user = user;
-    next();
+    const token = authHeader.split(' ')[1];
+    
+    try {
+      const decoded = verifyAccessToken(token);
+      
+      // Verify user still exists in database
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.userId },
+        include: { profile: true }
+      });
+
+      if (!user) {
+        return res.status(401).json({ error: 'User not found' });
+      }
+
+      req.user = {
+        userId: user.id,
+        email: user.email,
+        role: user.role
+      };
+
+      next();
+    } catch (error) {
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
   } catch (error) {
-    res.status(401).json({ error: 'Invalid token' });
+    console.error('Authentication error:', error);
+    return res.status(500).json({ error: 'Authentication failed' });
   }
 };
 
-export const authorize = (...roles: string[]) => {
+export const requireRole = (allowedRoles: string[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return res.status(401).json({ error: 'Not authenticated' });
+      return res.status(401).json({ error: 'Authentication required' });
     }
 
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ error: 'Insufficient permissions' });
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({ 
+        error: 'Insufficient permissions',
+        required: allowedRoles,
+        current: req.user.role
+      });
     }
 
     next();
   };
 };
+
+// Specific role middlewares for convenience
+export const requireHR = requireRole(['HR_EMPLOYEE', 'RECRUITMENT_ADMIN']);
+export const requireAdmin = requireRole(['RECRUITMENT_ADMIN']);
+export const requireHiringManager = requireRole(['HIRING_MANAGER', 'HR_EMPLOYEE', 'RECRUITMENT_ADMIN']);

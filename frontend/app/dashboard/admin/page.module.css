@@ -1,0 +1,21 @@
+:root{
+  --card:#ffffff;
+  --muted:#6b7280;
+  --accent:#2563eb;
+  --shadow: 0 8px 24px rgba(16,24,40,0.06);
+  --radius:12px;
+}
+
+.wrap{display:flex;flex-direction:column;gap:16px;font-family:Inter,system-ui,Arial;color:#0f172a}
+.headerCard{background:var(--card);padding:18px;border-radius:var(--radius);box-shadow:var(--shadow)}
+.h1{font-size:20px;margin:0 0 6px 0;font-weight:700}
+.lead{margin:0;color:var(--muted)}
+
+.grid{display:grid;grid-template-columns:1fr;gap:12px}
+.card{background:var(--card);padding:16px;border-radius:10px;box-shadow:var(--shadow)}
+.cardTitle{margin:0 0 6px 0;font-weight:700}
+.cardText{margin:0;color:var(--muted)}
+
+@media(min-width:900px){
+  .grid{grid-template-columns:repeat(3,1fr)}
+}

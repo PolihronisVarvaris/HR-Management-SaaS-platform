@@ -1,158 +1,138 @@
 import { Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../lib/db';
+import { hashPassword, comparePassword, validatePasswordStrength } from '../utils/password';
+import { generateTokens, verifyRefreshToken } from '../utils/jwt';
+import { LoginRequest, RegisterRequest, AuthRequest } from '../types/auth';
+import { UserRole } from '@prisma/client';
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { email, password, firstName, lastName, role } = req.body;
+    const { email, password, firstName, lastName, role }: RegisterRequest = req.body;
 
     // Validate input
-    if (!email || !password || !firstName || !lastName || !role) {
+    if (!email || !password || !firstName || !lastName) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-    // Check if user exists
+    // Validate password strength
+    if (!validatePasswordStrength(password)) {
+      return res.status(400).json({
+        error: 'Password must be at least 8 characters long and contain uppercase, lowercase, numbers, and special characters'
+      });
+    }
+
+    // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email }
     });
 
     if (existingUser) {
-      return res.status(400).json({ error: 'User already exists' });
+      return res.status(409).json({ error: 'User already exists' });
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12);
+    // Default to CANDIDATE role if not specified
+    const userRole = role && Object.values(UserRole).includes(role as UserRole) 
+      ? (role as UserRole) 
+      : UserRole.CANDIDATE;
 
-    // Create user
+    // Hash password and create user
+    const hashedPassword = await hashPassword(password);
+
     const user = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
-        firstName,
-        lastName,
-        role,
-        profile: role !== 'CANDIDATE' ? {
+        role: userRole,
+        profile: {
           create: {
-            skills: [],
-            experience: {},
-            education: {}
+            firstName,
+            lastName
           }
-        } : undefined
+        }
       },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        createdAt: true
+      include: {
+        profile: true
       }
     });
 
     // Generate tokens
-    const accessToken = jwt.sign(
-      { userId: user.id, role: user.role },
-      process.env.JWT_ACCESS_SECRET!,
-      { expiresIn: '15m' }
-    );
+    const tokens = generateTokens({
+      userId: user.id,
+      email: user.email,
+      role: user.role
+    });
 
-    const refreshToken = jwt.sign(
-      { userId: user.id },
-      process.env.JWT_REFRESH_SECRET!,
-      { expiresIn: '7d' }
-    );
+    // Return response (excluding password)
+    const { password: _, ...userWithoutPassword } = user;
 
-    // Store refresh token
-    await prisma.refreshToken.create({
-      data: {
-        token: refreshToken,
-        userId: user.id,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    res.status(201).json({
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        firstName: user.profile?.firstName,
+        lastName: user.profile?.lastName
       }
     });
 
-    res.status(201).json({
-      message: 'User created successfully',
-      user,
-      accessToken,
-      refreshToken
-    });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Registration failed' });
   }
 };
 
 export const login = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
+    const { email, password }: LoginRequest = req.body;
 
+    // Validate input
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
     // Find user
     const user = await prisma.user.findUnique({
-      where: { email, isActive: true }
+      where: { email },
+      include: { profile: true }
     });
 
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Check password
-    const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) {
+    // Verify password
+    const isPasswordValid = await comparePassword(password, user.password);
+    if (!isPasswordValid) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Update last login
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { lastLoginAt: new Date() }
-    });
-
     // Generate tokens
-    const accessToken = jwt.sign(
-      { userId: user.id, role: user.role },
-      process.env.JWT_ACCESS_SECRET!,
-      { expiresIn: '15m' }
-    );
-
-    const refreshToken = jwt.sign(
-      { userId: user.id },
-      process.env.JWT_REFRESH_SECRET!,
-      { expiresIn: '7d' }
-    );
-
-    // Store refresh token
-    await prisma.refreshToken.create({
-      data: {
-        token: refreshToken,
-        userId: user.id,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-      }
+    const tokens = generateTokens({
+      userId: user.id,
+      email: user.email,
+      role: user.role
     });
+
+    // Return response (excluding password)
+    const { password: _, ...userWithoutPassword } = user;
 
     res.json({
-      message: 'Login successful',
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
       user: {
         id: user.id,
         email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
         role: user.role,
-        createdAt: user.createdAt
-      },
-      accessToken,
-      refreshToken
+        firstName: user.profile?.firstName,
+        lastName: user.profile?.lastName
+      }
     });
+
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Login failed' });
   }
 };
 
@@ -161,63 +141,120 @@ export const refreshToken = async (req: Request, res: Response) => {
     const { refreshToken } = req.body;
 
     if (!refreshToken) {
-      return res.status(401).json({ error: 'Refresh token required' });
+      return res.status(400).json({ error: 'Refresh token required' });
     }
 
     // Verify refresh token
-    const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!) as any;
-    
-    // Check if token exists in database
-    const storedToken = await prisma.refreshToken.findFirst({
-      where: {
-        token: refreshToken,
-        userId: payload.userId,
-        revoked: false,
-        expiresAt: { gt: new Date() }
-      },
-      include: { user: true }
+    const decoded = verifyRefreshToken(refreshToken);
+
+    // Check if user still exists
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      include: { profile: true }
     });
 
-    if (!storedToken) {
-      return res.status(401).json({ error: 'Invalid refresh token' });
+    if (!user) {
+      return res.status(401).json({ error: 'User not found' });
     }
 
-    // Generate new access token
-    const accessToken = jwt.sign(
-      { userId: storedToken.user.id, role: storedToken.user.role },
-      process.env.JWT_ACCESS_SECRET!,
-      { expiresIn: '15m' }
-    );
+    // Generate new tokens
+    const tokens = generateTokens({
+      userId: user.id,
+      email: user.email,
+      role: user.role
+    });
 
-    res.json({ accessToken });
+    res.json({
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken
+    });
+
   } catch (error) {
+    console.error('Token refresh error:', error);
     res.status(401).json({ error: 'Invalid refresh token' });
   }
 };
 
-export const getMe = async (req: Request, res: Response) => {
+export const getCurrentUser = async (req: AuthRequest, res: Response) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
     const user = await prisma.user.findUnique({
-      where: { id: (req as any).user.userId },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        avatar: true,
-        createdAt: true,
-        lastLoginAt: true,
-        profile: true
-      }
+      where: { id: req.user.userId },
+      include: { profile: true }
     });
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    res.json({ user });
+    // Return user without password
+    const { password, ...userWithoutPassword } = user;
+
+    res.json({
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        firstName: user.profile?.firstName,
+        lastName: user.profile?.lastName,
+        phone: user.profile?.phone,
+        avatar: user.profile?.avatar
+      }
+    });
+
   } catch (error) {
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Get current user error:', error);
+    res.status(500).json({ error: 'Failed to get user data' });
+  }
+};
+
+export const changePassword = async (req: AuthRequest, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: 'Current and new password are required' });
+    }
+
+    if (!validatePasswordStrength(newPassword)) {
+      return res.status(400).json({
+        error: 'New password must be at least 8 characters long and contain uppercase, lowercase, numbers, and special characters'
+      });
+    }
+
+    // Get user with password
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.userId }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Verify current password
+    const isCurrentPasswordValid = await comparePassword(currentPassword, user.password);
+    if (!isCurrentPasswordValid) {
+      return res.status(401).json({ error: 'Current password is incorrect' });
+    }
+
+    // Hash new password and update
+    const hashedNewPassword = await hashPassword(newPassword);
+    await prisma.user.update({
+      where: { id: req.user.userId },
+      data: { password: hashedNewPassword }
+    });
+
+    res.json({ message: 'Password updated successfully' });
+
+  } catch (error) {
+    console.error('Change password error:', error);
+    res.status(500).json({ error: 'Failed to change password' });
   }
 };
