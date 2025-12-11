@@ -8,17 +8,17 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String // hashed
-  role      UserRole
-  profile   Profile?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  notes       Note[]
-  interviews  InterviewParticipant[]
-  auditLogs   AuditLog[]
-  notifications Notification[] 
+  id            String                 @id @default(cuid())
+  email         String                 @unique
+  password      String // hashed
+  role          UserRole
+  profile       Profile?
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+  notes         Note[]
+  interviews    InterviewParticipant[]
+  auditLogs     AuditLog[]
+  notifications Notification[]
 
   @@map("users")
 }
@@ -47,174 +47,178 @@ model Candidate {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-    applications Application[]
-    cvs         CV[]
-    notes       Note[]
-    interviews  InterviewParticipant[]
-    notifications Notification[]
+  applications  Application[]
+  cvs           CV[]
+  notes         Note[]
+  interviews    InterviewParticipant[]
+  notifications Notification[]
+  FormResponse  FormResponse[]
 
-    @@map("candidates")
-  }
+  @@map("candidates")
+}
 
-  model CV {
-    id          String   @id @default(cuid())
-    filename    String
-    fileUrl     String   // S3 URL
-    fileSize    Int
-    mimeType    String
-    summary     String?  // AI-generated summary
-    tags        String[] // AI-generated tags
-    candidateId String
-    candidate   Candidate @relation(fields: [candidateId], references: [id])
-    createdAt   DateTime @default(now())
+model CV {
+  id          String    @id @default(cuid())
+  filename    String
+  fileUrl     String // S3 URL
+  fileSize    Int
+  mimeType    String
+  summary     String? // AI-generated summary
+  tags        String[] // AI-generated tags
+  candidateId String
+  candidate   Candidate @relation(fields: [candidateId], references: [id])
+  createdAt   DateTime  @default(now())
 
-    @@map("cvs")
-  }
+  @@map("cvs")
+}
 
-  model Job {
-    id          String   @id @default(cuid())
-    title       String
-    description String?
-    department  String?
-    location    String?
-    status      JobStatus @default(DRAFT)
-    publishedAt DateTime?
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
-    applications Application[]
-    form        Form? 
+model Job {
+  id           String        @id @default(cuid())
+  title        String
+  description  String?
+  department   String?
+  location     String?
+  status       JobStatus     @default(DRAFT)
+  publishedAt  DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  applications Application[]
+  form         Form?
 
-    @@map("jobs")
-  }
+  @@map("jobs")
+}
 
-  model Application {
-    id          String   @id @default(cuid())
-    status      ApplicationStatus @default(APPLIED)
-    stage       ApplicationStage @default(APPLIED)
-    candidateId String
-    jobId       String
-    candidate   Candidate @relation(fields: [candidateId], references: [id])
-    job         Job      @relation(fields: [jobId], references: [id])
-    formResponse FormResponse?
-    notes       Note[]
-    interviews  Interview[]
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+model Application {
+  id           String            @id @default(cuid())
+  status       ApplicationStatus @default(APPLIED)
+  stage        ApplicationStage  @default(APPLIED)
+  candidateId  String
+  jobId        String
+  candidate    Candidate         @relation(fields: [candidateId], references: [id])
+  job          Job               @relation(fields: [jobId], references: [id])
+  formResponse FormResponse?
+  notes        Note[]
+  interviews   Interview[]
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
 
-    @@unique([candidateId, jobId])
-    @@map("applications")
-  }
+  @@unique([candidateId, jobId])
+  @@map("applications")
+}
 
-  model Form {
-    id          String   @id @default(cuid())
-    title       String
-    description String?
-    jobId       String?  @unique
-    job         Job?     @relation(fields: [jobId], references: [id])
-    fields      Json     // Array of form fields
-    isActive    Boolean  @default(true)
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+model Form {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  jobId       String?  @unique
+  job         Job?     @relation(fields: [jobId], references: [id])
+  fields      Json // Array of form fields
+  isActive    Boolean  @default(true)
+  createdBy   String // User ID of creator
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-    formResponses FormResponse[]
+  formResponses FormResponse[]
 
-    @@map("forms")
-  }
+  @@map("forms")
+}
 
-  model FormResponse {
-    id          String   @id @default(cuid())
-    formId      String
-    form        Form     @relation(fields: [formId], references: [id])
-    applicationId String @unique
-    application Application @relation(fields: [applicationId], references: [id])
-    answers     Json     // { fieldId: value }
-    submittedAt DateTime @default(now())
+model FormResponse {
+  id            String      @id @default(cuid())
+  formId        String
+  form          Form        @relation(fields: [formId], references: [id])
+  applicationId String      @unique
+  application   Application @relation(fields: [applicationId], references: [id])
+  candidateId   String?
+  candidate     Candidate?  @relation(fields: [candidateId], references: [id])
+  answers       Json // { fieldId: value }
+  submittedAt   DateTime    @default(now())
 
-    @@map("form_responses")
-  }
+  @@map("form_responses")
+}
 
-  model Note {
-    id            String   @id @default(cuid())
-    content       String
-    type          NoteType @default(PRIVATE)
-    authorId      String
-    author        User     @relation(fields: [authorId], references: [id])
-    candidateId   String
-    candidate     Candidate @relation(fields: [candidateId], references: [id])
-    applicationId String?
-    application   Application? @relation(fields: [applicationId], references: [id])
-    rating        Int?     // 1-5 scale
-    createdAt     DateTime @default(now())
-    updatedAt     DateTime @updatedAt
+model Note {
+  id            String       @id @default(cuid())
+  content       String
+  type          NoteType     @default(PRIVATE)
+  authorId      String
+  author        User         @relation(fields: [authorId], references: [id])
+  candidateId   String
+  candidate     Candidate    @relation(fields: [candidateId], references: [id])
+  applicationId String?
+  application   Application? @relation(fields: [applicationId], references: [id])
+  rating        Int? // 1-5 scale
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 
-    @@map("notes")
-  }
+  @@map("notes")
+}
 
-  model Interview {
-    id            String   @id @default(cuid())
-    applicationId String
-    application   Application @relation(fields: [applicationId], references: [id])
-    title         String
-    description   String?
-    startTime     DateTime
-    endTime       DateTime
-    location      String?  // or Google Meet link
-    status        InterviewStatus @default(SCHEDULED)
-    participants  InterviewParticipant[]
-    createdAt     DateTime @default(now())
-    updatedAt     DateTime @updatedAt
+model Interview {
+  id            String                 @id @default(cuid())
+  applicationId String
+  application   Application            @relation(fields: [applicationId], references: [id])
+  title         String
+  description   String?
+  startTime     DateTime
+  endTime       DateTime
+  location      String? // or Google Meet link
+  status        InterviewStatus        @default(SCHEDULED)
+  participants  InterviewParticipant[]
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
 
-    @@map("interviews")
-  }
+  @@map("interviews")
+}
 
-  model InterviewParticipant {
-    id          String   @id @default(cuid())
-    interviewId String
-    interview   Interview @relation(fields: [interviewId], references: [id])
-    userId      String?
-    user        User?    @relation(fields: [userId], references: [id])
-    candidateId String?
-    candidate   Candidate? @relation(fields: [candidateId], references: [id])
-    role        ParticipantRole
-    response    InterviewResponse? @default(PENDING)
+model InterviewParticipant {
+  id          String             @id @default(cuid())
+  interviewId String
+  interview   Interview          @relation(fields: [interviewId], references: [id])
+  userId      String?
+  user        User?              @relation(fields: [userId], references: [id])
+  candidateId String?
+  candidate   Candidate?         @relation(fields: [candidateId], references: [id])
+  role        ParticipantRole
+  response    InterviewResponse? @default(PENDING)
 
-    @@map("interview_participants")
-  }
+  @@map("interview_participants")
+}
 
-  model AuditLog {
-    id          String   @id @default(cuid())
-    action      String
-    resource    String   // e.g., "candidate", "application"
-    resourceId  String
-    userId      String
-    user        User     @relation(fields: [userId], references: [id])
-    oldData     Json?
-    newData     Json?
-    ipAddress   String?
-    userAgent   String?
-    createdAt   DateTime @default(now())
+model AuditLog {
+  id         String   @id @default(cuid())
+  action     String
+  resource   String // e.g., "candidate", "application"
+  resourceId String
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  oldData    Json?
+  newData    Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
 
-    @@map("audit_logs")
-  }
+  @@map("audit_logs")
+}
 
-  model Notification {
-    id          String   @id @default(cuid())
-    type        NotificationType
-    title       String
-    message     String
-    userId      String?
-    user        User?    @relation(fields: [userId], references: [id])
-    candidateId String?
-    candidate   Candidate? @relation(fields: [candidateId], references: [id])
-    read        Boolean  @default(false)
-    metadata    Json?    // additional data like interviewId, applicationId
-    createdAt   DateTime @default(now())
+model Notification {
+  id          String           @id @default(cuid())
+  type        NotificationType
+  title       String
+  message     String
+  userId      String?
+  user        User?            @relation(fields: [userId], references: [id])
+  candidateId String?
+  candidate   Candidate?       @relation(fields: [candidateId], references: [id])
+  read        Boolean          @default(false)
+  metadata    Json? // additional data like interviewId, applicationId
+  createdAt   DateTime         @default(now())
 
-    @@map("notifications")
-  }
+  @@map("notifications")
+}
 
-  // Enums
-  enum UserRole {
+// Enums
+enum UserRole {
   CANDIDATE
   HR_EMPLOYEE
   HIRING_MANAGER

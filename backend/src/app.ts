@@ -11,6 +11,7 @@ import jobRoutes from './routes/job.routes';
 import applicationRoutes from './routes/application.routes';
 import interviewRoutes from './routes/interview.routes';
 import adminRoutes from './routes/admin.routes';
+import userRoutes from './routes/user';
 
 // Load environment variables
 config();
@@ -35,6 +36,7 @@ app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/interviews', interviewRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/users', userRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

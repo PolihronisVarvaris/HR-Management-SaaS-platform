@@ -1,0 +1,570 @@
+.formBuilder {
+  width: 100%;
+}
+
+.builderLayout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 2rem;
+  min-height: 600px;
+}
+
+.toolbar {
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  height: fit-content;
+}
+
+.toolbarTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0 0 1rem 0;
+}
+
+.fieldTypes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fieldTypeButton {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  border: none;
+  width: 100%;
+}
+
+.fieldTypeButton:hover {
+  border-color: #3182ce;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.fieldIcon {
+  font-size: 1.25rem;
+}
+
+.fieldLabel {
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.preview {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+}
+
+.previewTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0 0 1rem 0;
+}
+
+.previewContent {
+  min-height: 500px;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #718096;
+}
+
+.emptyIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.emptyState h4 {
+  color: #4a5568;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+}
+
+.emptyState p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.fieldPreview {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+}
+
+.fieldPreview:hover {
+  border-color: #3182ce;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.fieldPreview.dragging {
+  opacity: 0.5;
+  border-style: dashed;
+}
+
+.fieldHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.fieldInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.fieldLabelText {
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 1rem;
+}
+
+.requiredStar {
+  color: #e53e3e;
+}
+
+.fieldTypeBadge {
+  background: #edf2f7;
+  color: #4a5568;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.fieldActions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.moveButton, .deleteButton {
+  background: #e2e8f0;
+  border: none;
+  padding: 0.375rem 0.5rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
+  min-width: 32px;
+}
+
+.moveButton:hover:not(:disabled) {
+  background: #cbd5e0;
+}
+
+.moveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.deleteButton:hover {
+  background: #fed7d7;
+  color: #e53e3e;
+}
+
+.fieldInput {
+  margin-top: 0.5rem;
+  width: 100%;
+}
+
+/* FIXED: Consistent input styles for all field types */
+.previewInput, .previewTextarea, .previewSelect {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  background: #f7fafc;
+  color: #718096;
+  font-size: 1rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.previewInput:focus, .previewTextarea:focus, .previewSelect:focus {
+  outline: none;
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.previewTextarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.previewSelect {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'><path fill='%236B7280' d='M2 0L0 2h4zm0 5L0 3h4z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 0.65rem;
+  padding-right: 2.5rem;
+}
+
+/* FIXED: Radio and checkbox groups */
+.radioGroup, .checkboxGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.radioLabel, .checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  color: #718096;
+  font-size: 1rem;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.radioLabel input, .checkboxLabel input {
+  margin: 0;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+/* FIXED: File input */
+.fileInput {
+  width: 100%;
+}
+
+.fileInput input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px dashed #e2e8f0;
+  border-radius: 0.375rem;
+  background: #f7fafc;
+  color: #718096;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.fileInput input:focus {
+  outline: none;
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+/* Date input specific fixes */
+.previewInput[type="date"] {
+  position: relative;
+}
+
+.previewInput[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+/* Modal Styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal {
+  background: white;
+  border-radius: 0.75rem;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.modalHeader h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #718096;
+  padding: 0;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+}
+
+.closeButton:hover {
+  background: #f7fafc;
+  color: #4a5568;
+}
+
+.modalContent {
+  padding: 1.5rem;
+}
+
+.fieldGroup {
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.label {
+  display: block;
+  font-weight: 500;
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.checkboxLabel input {
+  margin: 0;
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+}
+
+.optionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.optionItem {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  width: 100%;
+}
+
+.optionInput {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.optionInput:focus {
+  outline: none;
+  border-color: #3182ce;
+}
+
+.removeOptionButton {
+  background: #fed7d7;
+  color: #e53e3e;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 1rem;
+  min-width: 40px;
+  flex-shrink: 0;
+}
+
+.removeOptionButton:hover {
+  background: #feb2b2;
+}
+
+.addOption {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.addOptionButton {
+  background: #3182ce;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 1rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.addOptionButton:hover {
+  background: #2c5aa0;
+}
+
+.modalActions {
+  padding: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.secondaryButton {
+  background: #e2e8f0;
+  color: #4a5568;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.secondaryButton:hover {
+  background: #cbd5e0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .builderLayout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .toolbar {
+    order: 2;
+  }
+
+  .preview {
+    order: 1;
+  }
+
+  .fieldHeader {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .fieldActions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .modal {
+    margin: 1rem;
+  }
+
+  .fieldTypes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .fieldTypeButton {
+    flex-direction: column;
+    text-align: center;
+    padding: 1rem 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .fieldIcon {
+    font-size: 1.5rem;
+  }
+
+  .fieldLabel {
+    font-size: 0.875rem;
+  }
+
+  .previewInput, 
+  .previewTextarea, 
+  .previewSelect,
+  .fileInput input {
+    padding: 0.875rem;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}
+
+@media (max-width: 480px) {
+  .fieldTypes {
+    grid-template-columns: 1fr;
+  }
+  
+  .addOption {
+    flex-direction: column;
+  }
+  
+  .optionItem {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .removeOptionButton {
+    width: 100%;
+  }
+
+  .previewInput, 
+  .previewTextarea, 
+  .previewSelect,
+  .fileInput input {
+    padding: 1rem;
+  }
+}

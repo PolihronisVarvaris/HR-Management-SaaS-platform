@@ -7,4 +7,5 @@ router.get('/', authenticate, (req, res) => {
   res.json({ message: 'Admin route - not implemented yet' });
 });
 
+
 export default router;

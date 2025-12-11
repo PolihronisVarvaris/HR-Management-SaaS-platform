@@ -53,6 +53,13 @@ export const navigationConfig: NavigationItem[] = [
     icon: '🎯',
     roles: ['HR_EMPLOYEE', 'RECRUITMENT_ADMIN']
   },
+  // Add Forms to HR navigation
+  {
+    name: 'Forms',
+    href: '/dashboard/hr/forms',
+    icon: '📝',
+    roles: ['HR_EMPLOYEE', 'RECRUITMENT_ADMIN']
+  },
   
   // Admin specific
   {

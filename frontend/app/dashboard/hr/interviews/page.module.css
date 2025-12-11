@@ -443,3 +443,200 @@
   }
 
 }
+
+
+.headerButtons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.alertButton {
+  padding: 10px 16px;
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.alertButton:hover {
+  background-color: #e0e0e0;
+  border-color: #ccc;
+}
+
+.dropdownItem {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f5f5f5;
+  transition: background-color 0.2s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.dropdownItem:hover {
+  background-color: #f8f9fa;
+}
+
+/* Add and Select Buttons */
+.addButton, .selectButton {
+  background: #4299e1;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.8em;
+  font-weight: 600;
+}
+
+.addButton:hover, .selectButton:hover {
+  background: #3182ce;
+}
+
+/* Enhanced Selected Candidate */
+.selectedCandidate {
+  margin-top: 8px;
+  padding: 12px;
+  background: #f0fff4;
+  border: 1px solid #9ae6b4;
+  border-radius: 8px;
+}
+
+.selectedCandidateContent {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.selectedIcon {
+  font-size: 1.2em;
+}
+
+.selectedInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.selectedId {
+  font-size: 0.8em;
+  color: #718096;
+  margin-top: 2px;
+}
+
+/* Enhanced Participant Tags */
+.participantTag {
+  display: inline-flex;
+  align-items: center;
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 0.9em;
+  border: 1px solid #bbdefb;
+  gap: 8px;
+}
+
+.tagContent {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tagAvatar {
+  background: #1976d2;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7em;
+  font-weight: bold;
+}
+
+.tagName {
+  font-weight: 500;
+}
+
+.removeTag {
+  background: none;
+  border: none;
+  color: #1976d2;
+  cursor: pointer;
+  font-size: 1.2em;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.removeTag:hover {
+  background: #bbdefb;
+}
+
+/* Loading Spinner */
+.spinner {
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #4299e1;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loadingItem {
+  padding: 16px;
+  text-align: center;
+  color: #718096;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* No Participants Hint */
+.noParticipantsHint {
+  color: #a0aec0;
+  font-style: italic;
+  font-size: 0.9em;
+  padding: 10px;
+  text-align: center;
+  border: 1px dashed #e2e8f0;
+  border-radius: 6px;
+}
+
+/* Candidate Badge Styling */
+.candidateBadge {
+  background: #10b981;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.7em;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+/* Ensure the tag content has proper spacing */
+.tagContent {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

@@ -114,3 +114,18 @@ export interface InterviewFilters {
   page?: number
   limit?: number
 }
+
+export interface InterviewScheduleData {
+  candidateId: string
+  date: string
+  time: string
+  interviewerId: string
+  interviewerIds?: string[] // Add this for multiple participants
+  interviewerName: string
+  type: 'PHONE' | 'VIDEO' | 'IN_PERSON'
+  notes?: string
+  duration?: number
+  tags?: string[]
+  meetingLink?: string
+  location?: string
+}

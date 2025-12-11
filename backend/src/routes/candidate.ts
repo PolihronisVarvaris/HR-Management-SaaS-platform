@@ -1,3 +1,4 @@
+// backend/src/routes/candidate.ts - FIXED
 import { Router } from 'express';
 import multer from 'multer';
 import {
@@ -7,10 +8,10 @@ import {
   getCVs,
   applyForJob,
   getApplications,
-  getCandidates,
+  getCandidates,  // This function exists
   getCandidateById
 } from '../controllers/candidateController';
-import { authenticate, requireHR } from '../middleware/auth';
+import { authenticate, requireHR } from '../middleware/auth'; // Use authenticate instead of auth
 
 const router = Router();
 const upload = multer({
@@ -20,6 +21,9 @@ const upload = multer({
   }
 });
 
+// REMOVE THIS DUPLICATE LINE:
+// router.get('/', auth, candidateController.getCandidates); // DELETE THIS LINE
+
 // Candidate routes (authenticated candidates)
 router.get('/profile', authenticate, getCandidateProfile);
 router.put('/profile', authenticate, updateCandidateProfile);
@@ -28,8 +32,8 @@ router.get('/cv', authenticate, getCVs);
 router.post('/applications', authenticate, applyForJob);
 router.get('/applications', authenticate, getApplications);
 
-// HR routes (HR employees only)
-router.get('/', authenticate, requireHR, getCandidates);
+// HR routes (HR employees only) - This is the correct route
+router.get('/', authenticate, requireHR, getCandidates); // This uses the imported getCandidates function
 router.get('/:id', authenticate, requireHR, getCandidateById);
 
 export default router;
